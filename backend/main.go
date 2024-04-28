@@ -32,7 +32,9 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	endpoint := fmt.Sprintf("https://newsapi.org/v2/everything?q=%s&apiKey=%s", q[0], "8eca8ad8afbb42aea3a72d8cf8e466c7")
+	language := queryParams["language"]
+
+	endpoint := fmt.Sprintf("https://newsapi.org/v2/everything?q=%s&language=%s&apiKey=%s", q[0], language[0], "8eca8ad8afbb42aea3a72d8cf8e466c7")
 	resp, err := http.Get(endpoint)
 	if err != nil {
 		http.Error(w, "Error contacting News API", http.StatusInternalServerError)
@@ -51,6 +53,8 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error decoding response from News API", http.StatusInternalServerError)
 		return
 	}
+
+	// работа с данными
 
 	jsonResponse, err2 := json.Marshal(results)
 	if err2 != nil {

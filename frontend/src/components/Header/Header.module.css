@@ -33,3 +33,33 @@
    display: flex;
    gap: 20px;
 }
+
+.header__language {
+   font-size: 20px;
+   background-color: #fff;
+   padding: 5px 20px;
+   transition: all .5s;
+}
+
+.header__language:hover {
+   background-color: #b8a7a7;
+}
+
+.header__dropdown {
+   position: relative;
+}
+
+.dropdown__menu {
+   display: flex;
+   flex-direction: column;
+   gap: 5px;
+   background-color: #fff;
+   text-align: center;
+   position: absolute;
+   width: 100%;
+}
+
+.dropdown__item {
+   cursor: pointer;
+   font-size: 16px;
+}
