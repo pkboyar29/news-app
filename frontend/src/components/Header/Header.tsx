@@ -3,7 +3,7 @@ import styles from './Header.module.css'
 import { useState } from 'react'
 
 interface HeaderProps {
-   changeArticles: (articles: any[]) => void
+   changeArticles: (articles: any[], totalResults: number) => void
 }
 
 function Header({ changeArticles }: HeaderProps) {
@@ -15,7 +15,7 @@ function Header({ changeArticles }: HeaderProps) {
          .then(response => response.data)
          .then(
             dataJson => {
-               changeArticles(dataJson["articles"])
+               changeArticles(dataJson["articles"], dataJson["totalResults"])
             }
          )
    }

@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 function App() {
 
    const [articles, setArticles] = useState<any[]>([])
+   const [totalResults, setTotalResults] = useState<number>(0)
 
    useEffect(() => console.log(articles), [articles])
 
@@ -18,14 +19,25 @@ function App() {
       return formattedDate
    }
 
+   function changeArticles(articles: any[], totalResults: number) {
+      setArticles(articles)
+      setTotalResults(totalResults)
+   }
+
 
    return (
       <>
-         <Header changeArticles={setArticles} />
+         <Header changeArticles={changeArticles} />
+
          <div className={styles["content"]} >
+
+            <div className={styles["articles__info"]}>
+               {totalResults === 0 ? <>Результатов не было найдено</> : <>Около {totalResults} результатов было найдено</>}
+            </div>
+
             {articles.map(
-               article =>
-                  <div className={styles["article"]}>
+               (article, index) =>
+                  <div className={styles["article"]} key={index}>
                      <div className={styles["article__left"]}>
                         <a href={article.url} className={styles["article__title"]}>{article.title}</a>
                         <p className={styles["article__descr"]}>{article.description}</p>
