@@ -5,11 +5,22 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/rs/cors"
 )
 
 func main() {
-	http.HandleFunc("/api/search", searchHandler)
-	http.ListenAndServe(":8081", nil)
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/api/search", searchHandler)
+
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"http://localhost:5173"},
+	})
+	// создаем экземляр CORS middleware, разрешая всем
+	handler := c.Handler(mux) // обертываем маршрутизатор в CORS middleware
+
+	http.ListenAndServe(":8080", handler)
 }
 
 func searchHandler(w http.ResponseWriter, r *http.Request) {
