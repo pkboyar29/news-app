@@ -3,10 +3,10 @@ import styles from './Header.module.css'
 import { useState } from 'react'
 
 interface HeaderProps {
-   changeArticles: (articles: any[], totalResults: number) => void
+   searchArticles: (articles: any[], totalResults: number, totalPages: number, lang: string, searchText: string) => void
 }
 
-function Header({ changeArticles }: HeaderProps) {
+function Header({ searchArticles }: HeaderProps) {
 
    const [searchText, setSearchText] = useState<string>("")
    const [selectedLang, setSelectedLang] = useState<string>("")
@@ -42,11 +42,12 @@ function Header({ changeArticles }: HeaderProps) {
 
    function handleClick() {
       console.log(selectedLang)
-      axios.get(`http://localhost:8080/api/search?q=${searchText}&language=${selectedLang}`)
+      axios.get(`http://localhost:8080/api/search?q=${searchText}&page=1&language=${selectedLang}`)
          .then(response => response.data)
          .then(
-            dataJson => {
-               changeArticles(dataJson["articles"], dataJson["totalResults"])
+            data => {
+               console.log(data)
+               searchArticles(data["articles"], data["totalResults"], data["totalPages"], selectedLang, searchText)
             }
          )
    }
@@ -60,6 +61,9 @@ function Header({ changeArticles }: HeaderProps) {
    }
 
    function handleItemClick(langCode: LangCode) {
+
+      toggleDropMenu()
+
       const headerLanguageElement = document.querySelector(`.${styles["header__language"]}`) as HTMLElement
       headerLanguageElement.textContent = langCode
 

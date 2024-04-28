@@ -1,11 +1,16 @@
 import styles from './App.module.css'
 import Header from '../components/Header/Header'
 import { useEffect, useState } from 'react'
+import axios from 'axios'
 
 function App() {
 
    const [articles, setArticles] = useState<any[]>([])
    const [totalResults, setTotalResults] = useState<number>(0)
+   const [totalPages, setTotalPages] = useState<number>(0)
+   const [currentPage, setCurrentPage] = useState<number>(1)
+   const [currentLang, setCurrentLang] = useState<string>("")
+   const [currentSearchText, setCurrentSearchText] = useState<string>("")
 
    useEffect(() => console.log(articles), [articles])
 
@@ -19,21 +24,54 @@ function App() {
       return formattedDate
    }
 
-   function changeArticles(articles: any[], totalResults: number) {
+   function searchArticles(articles: any[], totalResults: number, totalPages: number, lang: string, searchText: string) {
       setArticles(articles)
       setTotalResults(totalResults)
+      setTotalPages(totalPages)
+      setCurrentLang(lang)
+      setCurrentSearchText(searchText)
+      setCurrentPage(1)
    }
 
+   function changeArticlesPage() {
+      axios.get(`http://localhost:8080/api/search?q=${currentSearchText}&page=${currentPage}&language=${currentLang}`)
+         .then(response => response.data)
+         .then(data => {
+            setArticles(data["articles"])
+         })
+   }
+
+   function pageBack() {
+      if (currentPage > 1) {
+         setCurrentPage(currentPage - 1)
+         changeArticlesPage()
+      }
+   }
+
+   function pageForward() {
+      if (currentPage < totalPages) {
+         setCurrentPage(currentPage + 1)
+         changeArticlesPage()
+      }
+   }
 
    return (
       <>
-         <Header changeArticles={changeArticles} />
+         <Header searchArticles={searchArticles} />
 
          <div className={styles["content"]} >
 
             <div className={styles["articles__info"]}>
-               {totalResults === 0 ? <>Результатов не было найдено</> : <>Около {totalResults} результатов было найдено</>}
+               {totalResults === 0 ? <>Результатов не было найдено</> : <>Около {totalResults} результатов было найдено. Вы находитесь на {currentPage} из {totalPages} страниц</>}
             </div>
+
+            {
+               totalResults === 0 ? <></> :
+                  <div className={styles["pagination"]}>
+                     <button onClick={pageBack} className={styles["pagination__back"]}>Назад</button>
+                     <button onClick={pageForward} className={styles["pagination__forward"]}>Вперед</button>
+                  </div>
+            }
 
             {articles.map(
                (article, index) =>

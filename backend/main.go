@@ -3,7 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/rs/cors"
@@ -34,7 +36,17 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 
 	language := queryParams["language"]
 
-	endpoint := fmt.Sprintf("https://newsapi.org/v2/everything?q=%s&language=%s&apiKey=%s", q[0], language[0], "8eca8ad8afbb42aea3a72d8cf8e466c7")
+	pageSize := 10
+
+	pageStr, ok := queryParams["page"]
+	var page int
+	if ok {
+		page, _ = strconv.Atoi(pageStr[0])
+	} else {
+		page = 1 // Устанавливаем значение по умолчанию
+	}
+
+	endpoint := fmt.Sprintf("https://newsapi.org/v2/everything?q=%s&language=%s&pageSize=%d&page=%d&sortBy=publishedAt&apiKey=%s", q[0], language[0], pageSize, page, "8eca8ad8afbb42aea3a72d8cf8e466c7")
 	resp, err := http.Get(endpoint)
 	if err != nil {
 		http.Error(w, "Error contacting News API", http.StatusInternalServerError)
@@ -55,6 +67,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// работа с данными
+	results.TotalPages = int(math.Ceil(float64(results.TotalResults / pageSize)))
 
 	jsonResponse, err2 := json.Marshal(results)
 	if err2 != nil {
@@ -84,5 +97,6 @@ type Article struct {
 type Results struct {
 	Status       string    `json:"status"`
 	TotalResults int       `json:"totalResults"`
+	TotalPages   int       `json:"totalPages"`
 	Articles     []Article `json:"articles"`
 }
